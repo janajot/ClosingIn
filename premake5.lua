@@ -18,6 +18,9 @@ project "ClosingIn"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "pch.h"
+	pchsource "ClosingIn/src/pch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",
@@ -42,6 +45,7 @@ project "ClosingIn"
 	}
 
 	filter "system:windows"
+		defines "SR_WINDOWS"
 		cppdialect "C++17"
 		staticruntime "On"
 		systemversion "latest"
