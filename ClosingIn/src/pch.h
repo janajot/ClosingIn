@@ -18,7 +18,10 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#ifdef SR_WINDOWS
+#ifdef PLATFORM_WINDOWS
 #include <Windows.h>
+#elif PLATRFORM_LINUX
+#elif PLATRFORM_MAC
 #endif
+
 
