@@ -44,7 +44,6 @@ void Engine::Run()
             layer->OnUpdate();
     }
     /////////////////////////////////////////////////////////////////
-
     OnShutDown();
     ShutDownScene();
 

@@ -8,7 +8,7 @@ project(Engine)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(Engine/src)
+include_directories(Engine/src Engine/vendor/glm)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_BUILD_TYPE Debug)
@@ -22,12 +22,20 @@ elseif (CMAKE_BUILD_TYPE MATCHES Dist)
     add_compile_definitions(DIST)
 endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
+if(WIN32)
+    add_compile_definitions(PLATFORM_WINDOWS)
+elseif (UNIX)
+    add_compile_definitions(PLATFORM_LINUX)
+elseif (APPLE)
+    add_compile_definitions(PLATFORM_MAC)
+endif (WIN32)
+
 add_library(Engine
         Engine/src/Events/Event.cpp
         Engine/src/Events/Event.h
         Engine/src/Events/Input.cpp
         Engine/src/Events/Input.h
-        Engine/src/EngineAPI.h
+        Engine/EngineAPI.h
         Engine/src/Engine.cpp
         Engine/src/Engine.h
         Engine/src/EntryPoint.h
@@ -45,7 +53,7 @@ project(Closing)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(Closing/src)
+include_directories(Closing/src Engine)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("debug mode")
@@ -61,7 +69,8 @@ endif(CMAKE_BUILD_TYPE MATCHES Debug)
 add_executable(Closing
         Closing/main.cpp
         Closing/Level-GreenHill/GameLayer.cpp
-        Closing/Level-GreenHill/GameLayer.h)
+        Closing/Level-GreenHill/GameLayer.h
+        Engine/src/Math/Math.h)
 target_link_libraries(Closing Engine)
 
 #//////////////////////////////////////////////////////////////////////////////////

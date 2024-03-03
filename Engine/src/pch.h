@@ -18,10 +18,10 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include "Math/Math.h"
+
 #ifdef PLATFORM_WINDOWS
 #include <Windows.h>
 #elif PLATRFORM_LINUX
 #elif PLATRFORM_MAC
 #endif
-
-
