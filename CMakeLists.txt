@@ -35,7 +35,7 @@ add_library(Engine
         Engine/src/Events/Event.h
         Engine/src/Events/Input.cpp
         Engine/src/Events/Input.h
-        Engine/EngineAPI.h
+        Engine/includes/EngineAPI.h
         Engine/src/Engine.cpp
         Engine/src/Engine.h
         Engine/src/EntryPoint.h
@@ -53,7 +53,7 @@ project(Closing)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(Closing/src Engine)
+include_directories(Closing/src Engine/includes)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("debug mode")
