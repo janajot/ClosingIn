@@ -2,7 +2,6 @@
 // Created by Let'sBlend on 26/02/2024.
 //
 
-#include "Event.h"
 #include "Input.h"
 
 void Input::StartUp()
@@ -12,7 +11,7 @@ void Input::StartUp()
 
 void Input::ShutDown()
 {
-    std::cout << "Initialized event sub system" << std::endl;
+    std::cout << "Shut downed input sub system" << std::endl;
 }
 
 /*

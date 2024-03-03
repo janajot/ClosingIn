@@ -236,7 +236,6 @@ public:
     static void FireEvent(EventType eventType, void(*sender)());
 private:
     // Stores all listeners
-    //inline static std::vector<Listener> listeners[NUM_EVENTS];
     inline static std::unordered_set<Listener> listeners[NUM_EVENTS];
 };
 

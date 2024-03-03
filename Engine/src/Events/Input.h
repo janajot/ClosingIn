@@ -5,6 +5,8 @@
 #ifndef CLOSINGIN_INPUT_H
 #define CLOSINGIN_INPUT_H
 
+#include "Event.h"
+
 struct KeyBoardState
 {
     uint8_t key[256];

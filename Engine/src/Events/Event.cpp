@@ -11,6 +11,8 @@ void Event::StartUp()
 
 void Event::ShutDown()
 {
+    for(auto & listener : listeners)
+        listener.clear();
     std::cout << "Shut downed event sub system" << std::endl;
 }
 
