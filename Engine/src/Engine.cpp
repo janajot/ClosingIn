@@ -52,14 +52,14 @@ void Engine::Run()
     Event::ShutDown();
 }
 
-void Engine::PushScene(const std::string& name)
+void Engine::PushScene(std::string&& name)
 {
-    sceneStack->PushScene(name);
+    sceneStack->PushScene(std::move(name));
 }
 
-void Engine::PopScene(const std::string& name)
+void Engine::PopScene(std::string&& name)
 {
-    sceneStack->PopScene(name);
+    sceneStack->PopScene(std::move(name));
 }
 
 void Engine::SwitchScene(const std::string& name)
@@ -74,15 +74,15 @@ void Engine::SwitchScene(const std::string& name)
         std::cout << "[WARN]: No layer was pushed to active scene!" << std::endl;
 }
 
-void Engine::PushLayer(const std::string &scene, Layer *layer)
+void Engine::PushLayer(std::string&& scene, Layer *layer)
 {
-    std::shared_ptr<Scene> getScene = sceneStack->GetScene(scene);
+    std::shared_ptr<Scene> getScene = sceneStack->GetScene(std::move(scene));
     getScene->layerStack.PushLayer(layer);
 }
 
-void Engine::PopLayer(const std::string &scene, Layer *layer)
+void Engine::PopLayer(std::string&& scene, Layer *layer)
 {
-    std::shared_ptr<Scene> getScene = sceneStack->GetScene(scene);
+    std::shared_ptr<Scene> getScene = sceneStack->GetScene(std::move(scene));
     getScene->layerStack.PopLayer(layer);
 }
 

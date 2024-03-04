@@ -7,14 +7,14 @@
 #include "Scene.h"
 #include "LayerStack.h"
 
-void SceneStack::PushScene(const std::string& name)
+void SceneStack::PushScene(std::string&& name)
 {
-    scenePtrs.emplace_back(new Scene(name));
+    scenePtrs.emplace_back(new Scene(std::move(name)));
 }
 
-void SceneStack::PopScene(const std::string& name)
+void SceneStack::PopScene(std::string&& name)
 {
-    std::shared_ptr<Scene> scene = GetScene(name);
+    std::shared_ptr<Scene> scene = GetScene(std::move(name));
     scene->layerStack.PopAll();
 
     auto id = std::find(scenePtrs.begin(), scenePtrs.end(), scene);
@@ -30,7 +30,7 @@ void SceneStack::PopAll()
     scenePtrs.clear();
 }
 
-std::shared_ptr<Scene> SceneStack::GetScene(const std::string &name)
+std::shared_ptr<Scene> SceneStack::GetScene(std::string&& name)
 {
     for(int i = scenePtrs.size() - 1; i >= 0; i--)
     {

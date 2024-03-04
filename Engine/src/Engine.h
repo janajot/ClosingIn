@@ -21,12 +21,12 @@ public:
 
     void Run();
 
-    static void PushScene(const std::string& name);
-    static void PopScene(const std::string& name);
+    static void PushScene(std::string&& name);
+    static void PopScene(std::string&& name);
     static void SwitchScene(const std::string& name);
 
-    static void PushLayer(const std::string& scene, Layer* layer);
-    static void PopLayer(const std::string& scene, Layer* layer);
+    static void PushLayer(std::string&& scene, Layer* layer);
+    static void PopLayer(std::string&& scene, Layer* layer);
 
     inline static bool run = true;
 private:

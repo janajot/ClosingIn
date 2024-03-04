@@ -10,6 +10,9 @@
 class Scene
 {
 public:
+    Scene(std::string&& name) : name(name) {}
+    ~Scene() = default;
+
     std::string name = "None";
     LayerStack layerStack;
 };

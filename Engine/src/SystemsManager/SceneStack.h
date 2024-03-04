@@ -10,11 +10,11 @@ class Scene;
 class SceneStack
 {
 public:
-    void PushScene(const std::string& name);
-    void PopScene(const std::string& name);
+    void PushScene(std::string&& name);
+    void PopScene(std::string&& name);
     void PopAll();
 
-    std::shared_ptr<Scene> GetScene(const std::string& name);
+    std::shared_ptr<Scene> GetScene(std::string&& name);
     std::vector<std::shared_ptr<Scene>>::iterator begin() { return scenePtrs.begin(); }
     std::vector<std::shared_ptr<Scene>>::iterator end() { return scenePtrs.end(); }
 
