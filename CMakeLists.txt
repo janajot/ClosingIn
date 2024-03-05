@@ -8,7 +8,7 @@ project(Engine)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(Engine/src Engine/vendor/glm)
+include_directories(Engine/src Engine/vendor/glm Engine/vendor/GLFW/include)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_BUILD_TYPE Debug)
@@ -44,7 +44,9 @@ add_library(Engine
         Engine/src/SystemsManager/LayerStack.cpp
         Engine/src/SystemsManager/LayerStack.h
         Engine/src/SystemsManager/SceneStack.cpp
-        Engine/src/SystemsManager/SceneStack.h)
+        Engine/src/SystemsManager/SceneStack.h
+        Engine/src/Window/Window.cpp
+        Engine/src/Window/Window.h)
 target_precompile_headers(Engine PUBLIC Engine/src/pch.h)
 
 #//////////////////////////////////////////////////////////////////////////////////
@@ -66,11 +68,13 @@ elseif (CMAKE_BUILD_TYPE MATCHES Dist)
     add_compile_definitions(DIST)
 endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
+add_subdirectory(Engine/vendor/GLFW)
+
 add_executable(Closing
         Closing/main.cpp
         Closing/Level-GreenHill/GameLayer.cpp
         Closing/Level-GreenHill/GameLayer.h
         Engine/src/Math/Math.h)
-target_link_libraries(Closing Engine)
+target_link_libraries(Closing Engine glfw)
 
 #//////////////////////////////////////////////////////////////////////////////////

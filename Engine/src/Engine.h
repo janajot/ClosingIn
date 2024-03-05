@@ -5,9 +5,10 @@
 #ifndef APPLICATION_ENGINE_H
 #define APPLICATION_ENGINE_H
 
+class Listener;
+
 class SceneStack;
 class Scene;
-
 class Layer;
 
 class Engine
@@ -25,16 +26,21 @@ public:
     static void PopScene(std::string&& name);
     static void SwitchScene(const std::string& name);
 
+    // Pushes a layer and calls the OnStartUp function from the layer
     static void PushLayer(std::string&& scene, Layer* layer);
+    // Pops a layer and calls the OnShutDown function from the layer
     static void PopLayer(std::string&& scene, Layer* layer);
 
-    inline static bool run = true;
 private:
+    void CloseApplication(Listener listener);
+
     void StartUpScene();
     void ShutDownScene();
 
     inline static std::shared_ptr<Scene> activeScene = nullptr;
     inline static SceneStack* sceneStack;
+
+    inline static bool run = true;
 
     inline static Engine* s_Instance = nullptr;
 };

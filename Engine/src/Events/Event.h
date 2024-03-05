@@ -195,17 +195,17 @@ struct Listener
     // The type of event listened to
     EventType eventType;
     // Pointer to the listener
-    void (*listener)(Listener& listening) = nullptr;
+    std::function<void(Listener)> listener = nullptr;
     // Pointer to the sender
-    void (*sender)() = nullptr;
+    std::function<void()> sender = nullptr;
     // Data that is different for different events, for example
     // MouseMoveEvent: mouse position, mousedelta..
     // KeyPressedEvent: Key..
-    EventContext metaData;
+    EventContext metaData{};
 
     bool operator==(const Listener& other) const
     {
-        return eventType == other.eventType && listener == other.listener;
+        return eventType == other.eventType && &listener == &other.listener;
     }
 };
 
@@ -216,10 +216,13 @@ struct std::hash<Listener>
     {
         // Compute individual hash values for two members and combine them
         size_t h1 = std::hash<EventType>{}(s.eventType);
-        size_t h2 = std::hash<void*>{}((void*)s.listener);
+        auto ptr = reinterpret_cast<void*>(*(uintptr_t*)&s.listener);
+        size_t h2 = std::hash<void*>{}(ptr);
         return h1 ^ (h2 << 1); // or use another method to combine hash values
     }
 };
+
+class Engine;
 
 class Event
 {
@@ -228,12 +231,36 @@ public:
     static void ShutDown();
 
     // Registers a listener to a certain Event type
-    static void RegisterEvent(EventType eventType, void(*listener)(Listener& listening));
+    template<typename T>
+    static void RegisterEvent(EventType eventType, T* obj, void(T::*funcPtr)(Listener listener))
+    {
+        listeners[(int)eventType].insert(Listener{eventType, std::bind(funcPtr, obj, std::placeholders::_1)});
+    }
     // Unregisters a listener to a certain Event type
-    static void UnregisterEvent(EventType eventType, void(*listener)(Listener& listening));
+    template<typename T>
+    static void UnregisterEvent(EventType eventType, T* obj, void(T::*funcPtr)(Listener listener))
+    {
+        listeners[(int)eventType].erase(Listener{eventType, std::bind(funcPtr, obj, std::placeholders::_1)});
+    }
+    // Fires an event of a certain type
+    template<typename T>
+    static void FireEvent(EventType eventType, T* obj, void(T::*funcPtr)())
+    {
+        for(Listener listener : listeners[(int)eventType])
+        {
+            listener.sender = std::bind(funcPtr, obj);
+            listener.listener(listener);
+        }
+    }
+
+    // Registers a listener to a certain Event type
+    static void RegisterEvent(EventType eventType, const std::function<void(Listener)>& funcPtr);
+    // Unregisters a listener to a certain Event type
+    static void UnregisterEvent(EventType eventType, const std::function<void(Listener)>& funcPtr);
 
     // Fires an event of a certain type
-    static void FireEvent(EventType eventType, void(*sender)());
+    static void FireEvent(EventType eventType, const std::function<void()>& funcPtr);
+
 private:
     // Stores all listeners
     inline static std::unordered_set<Listener> listeners[NUM_EVENTS];

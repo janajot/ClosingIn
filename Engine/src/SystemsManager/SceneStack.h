@@ -15,11 +15,15 @@ public:
     void PopAll();
 
     std::shared_ptr<Scene> GetScene(std::string&& name);
-    std::vector<std::shared_ptr<Scene>>::iterator begin() { return scenePtrs.begin(); }
-    std::vector<std::shared_ptr<Scene>>::iterator end() { return scenePtrs.end(); }
+    inline std::shared_ptr<Scene> front() { return scenePtrs.front(); }
+    inline std::shared_ptr<Scene> back() { return scenePtrs.back(); }
+    inline bool empty() { return scenePtrs.empty(); }
 
-    std::vector<std::shared_ptr<Scene>> scenePtrs;
+    inline std::vector<std::shared_ptr<Scene>>::iterator begin() { return scenePtrs.begin(); }
+    inline std::vector<std::shared_ptr<Scene>>::iterator end() { return scenePtrs.end(); }
+
 private:
+    std::vector<std::shared_ptr<Scene>> scenePtrs;
 };
 
 

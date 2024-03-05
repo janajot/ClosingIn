@@ -4,6 +4,8 @@
 
 #include "Event.h"
 
+#include <utility>
+
 void Event::StartUp()
 {
     std::cout << "Initialized event sub system" << std::endl;
@@ -16,22 +18,21 @@ void Event::ShutDown()
     std::cout << "Shut downed event sub system" << std::endl;
 }
 
-void Event::RegisterEvent(EventType eventType, void (*listener)(Listener& listening))
+void Event::RegisterEvent(EventType eventType, const std::function<void(Listener)>& funcPtr)
 {
-    listeners[(int)eventType].insert(Listener{eventType, listener});
+    listeners[(int)eventType].insert(Listener{eventType, funcPtr});
 }
 
-void Event::UnregisterEvent(EventType eventType, void (*listener)(Listener& listening))
+void Event::UnregisterEvent(EventType eventType, const std::function<void(Listener)>& funcPtr)
 {
-    listeners[(int)eventType].erase(Listener{eventType, listener});
+    listeners[(int)eventType].erase(Listener{eventType, funcPtr});
 }
 
-void Event::FireEvent(EventType eventType, void (*sender)())
+void Event::FireEvent(EventType eventType, const std::function<void()>& funcPtr)
 {
     for(Listener listener : listeners[(int)eventType])
     {
-        listener.sender = sender;
+        listener.sender = funcPtr;
         listener.listener(listener);
     }
 }
-

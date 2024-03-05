@@ -4,13 +4,15 @@
 
 #include "Engine.h"
 
+#include "Events/Event.h"
+#include "Events/Input.h"
+#include "GLFW/glfw3.h"
+#include "Window/Window.h"
+
 #include "SystemsManager/Layer.h"
 #include "SystemsManager/LayerStack.h"
 #include "SystemsManager/Scene.h"
 #include "SystemsManager/SceneStack.h"
-
-#include "Events/Event.h"
-#include "Events/Input.h"
 
 Engine::Engine()
 {
@@ -21,33 +23,49 @@ Engine::~Engine()
 {
 
 }
+void Test()
+{
 
+}
 void Engine::Run()
 {
-    // Testing Event System
-    /////////////////////////////////////////////////////////////////
     Event::StartUp();
     Input::StartUp();
+
+    Window window;
+    window.StartUp("ClosingIn", 640, 480);
+
     sceneStack = new SceneStack;
 
     OnStartUp();
     StartUpScene();
 
+    Event::RegisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
+
     while (run)
     {
+        //glClearColor(1, 0, 1, 1);
+        //glClear(GL_COLOR_BUFFER_BIT);
+        window.Update();
+
         std::string str;
         std::getline(std::cin, str);
         if(str == "Fire")
-            Event::FireEvent(EventType::KeyPressed, nullptr);
+            Event::FireEvent(EventType::WindowClose, nullptr);
 
         for(Layer* layer : activeScene->layerStack)
             layer->OnUpdate();
     }
-    /////////////////////////////////////////////////////////////////
+
+    Event::UnregisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
+
     OnShutDown();
     ShutDownScene();
 
     delete sceneStack;
+
+    window.ShutDown();
+
     Input::ShutDown();
     Event::ShutDown();
 }
@@ -64,7 +82,7 @@ void Engine::PopScene(std::string&& name)
 
 void Engine::SwitchScene(const std::string& name)
 {
-    for(const std::shared_ptr<Scene>& scene : sceneStack->scenePtrs)
+    for(const std::shared_ptr<Scene>& scene : *sceneStack)
     {
         if(scene->name == name)
             activeScene = scene;
@@ -88,10 +106,10 @@ void Engine::PopLayer(std::string&& scene, Layer *layer)
 
 void Engine::StartUpScene()
 {
-    if(sceneStack->scenePtrs.empty())
+    if(sceneStack->empty())
         std::cout << "[ERROR]: No scene was pushed!" << std::endl; // We need assertions
 
-    activeScene = sceneStack->scenePtrs[0];
+    activeScene = sceneStack->front();
 
     if(activeScene->layerStack.empty())
         std::cout << "[WARNING]: No layer was pushed to active scene!" << std::endl;
@@ -102,3 +120,7 @@ void Engine::ShutDownScene()
     sceneStack->PopAll();
 }
 
+void Engine::CloseApplication(Listener listener)
+{
+    run = false;
+}
