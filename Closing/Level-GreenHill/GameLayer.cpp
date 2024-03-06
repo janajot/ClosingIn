@@ -5,8 +5,6 @@
 #include "GameLayer.h"
 #include "EngineAPI.h"
 
-void CloseApplication(Listener& listener);
-
 void GameLayer::OnStartUp()
 {
     std::cout << "Initialized gamelayer sub system" << std::endl;
@@ -19,5 +17,5 @@ void GameLayer::OnShutDown()
 
 void GameLayer::OnUpdate()
 {
-    std::cout << "updating gamelayer sub system" << std::endl;
+    //std::cout << "updating gamelayer sub system" << std::endl;
 }

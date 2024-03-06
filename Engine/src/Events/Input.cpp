@@ -3,9 +3,11 @@
 //
 
 #include "Input.h"
+#include "glfw/glfw3.h"
 
-void Input::StartUp()
+void Input::StartUp(GLFWwindow* glfWwindow)
 {
+    targetWindow = glfWwindow;
     std::cout << "Initialized input sub system" << std::endl;
 }
 
@@ -14,59 +16,80 @@ void Input::ShutDown()
     std::cout << "Shut downed input sub system" << std::endl;
 }
 
-/*
+void Input::Update()
+{
+    for(int i = 0; i < 256; i++)
+    {
+        inputState.previousKeyState.key[i] = glfwGetKey(targetWindow, i);
+    }
+
+    inputState.previousMouseState.button[0] = glfwGetMouseButton(targetWindow, 0);
+    inputState.previousMouseState.button[1] = glfwGetMouseButton(targetWindow, 1);
+    inputState.previousMouseState.button[2] = glfwGetMouseButton(targetWindow, 2);
+}
+
 bool Input::GetKeyDown(KeyCode key)
 {
-    BYTE keyState = BYTE(GetKeyState((int)key));
-    BYTE prevKeyState = Input::prevKeyStates[(int)key];
-    if (keyState > prevKeyState)
+    int keyCode = glfwGetKey(targetWindow, (int)key);
+    inputState.currentKeyState.key[(int)key] = keyCode;
+
+    if(keyCode != inputState.previousKeyState.key[(int)key] && keyCode == 1)
         return true;
-    return false;
-}
-bool Input::GetKeyUp(KeyCode key)
-{
-    BYTE keyState = BYTE(GetKeyState((int)key));
-    BYTE prevKeyState = Input::prevKeyStates[(int)key];
-    if (keyState < prevKeyState)
-        return true;
+
     return false;
 }
 
+bool Input::GetKeyUp(KeyCode key)
+{
+    int keyCode = glfwGetKey(targetWindow, (int)key);
+    inputState.currentKeyState.key[(int)key] = keyCode;
+
+    if(keyCode != inputState.previousKeyState.key[(int)key] && keyCode == 0)
+        return true;
+
+    return false;
+}
 bool Input::GetKey(KeyCode key)
 {
-    BYTE keyState = BYTE(GetKeyState((int)key));
-    return keyState > 1 ? true : false;
+    if(glfwGetKey(targetWindow, (int)key))
+        return true;
+
+    return false;
 }
 bool Input::GetButtonDown(Button mouseButton)
 {
-    BYTE keyState = BYTE(GetKeyState((int)mouseButton));
-    BYTE prevKeyState = Input::prevKeyStates[(int)mouseButton];
-    if (keyState > prevKeyState)
+    int keyCode = glfwGetMouseButton(targetWindow, (int)mouseButton);
+    inputState.currentMouseState.button[(int)mouseButton] = keyCode;
+
+    if(keyCode != inputState.previousMouseState.button[(int)mouseButton] && keyCode == 1)
         return true;
+
     return false;
 }
 bool Input::GetButtonUp(Button mouseButton)
 {
-    BYTE keyState = BYTE(GetKeyState((int)mouseButton));
-    BYTE prevKeyState = Input::prevKeyStates[(int)mouseButton];
-    if (keyState < prevKeyState)
+    int keyCode = glfwGetMouseButton(targetWindow, (int)mouseButton);
+    inputState.currentMouseState.button[(int)mouseButton] = keyCode;
+
+    if(keyCode != inputState.previousMouseState.button[(int)mouseButton] && keyCode == 0)
         return true;
+
     return false;
 }
 
 bool Input::GetButton(Button mouseButton)
 {
-    BYTE buttonState = BYTE(GetKeyState((int)mouseButton));
+    if(glfwGetMouseButton(targetWindow, (int)mouseButton))
+        return true;
 
-    return buttonState > 1 ? true : false;
+    return false;
 }
 bool Input::AnyKeyDown()
 {
     for (int i = 0; i < 256; i++)
     {
-        BYTE keyState = BYTE(GetKeyState(i));
-        BYTE prevKeyState = Input::prevKeyStates[i];
-        if (keyState > prevKeyState)
+        int keyCode = glfwGetKey(targetWindow, i);
+        if (keyCode > inputState.previousKeyState.key[i])
             return true;
     }
 
@@ -76,9 +99,8 @@ bool Input::AnyKeyUp()
 {
     for (int i = 0; i < 256; i++)
     {
-        BYTE keyState = BYTE(GetKeyState(i));
-        BYTE prevKeyState = Input::prevKeyStates[i];
-        if (keyState < prevKeyState)
+        int keyCode = glfwGetKey(targetWindow, i);
+        if (keyCode < inputState.previousKeyState.key[i])
             return true;
     }
 
@@ -89,11 +111,46 @@ bool Input::AnyKey()
 {
     for (int i = 0; i < 256; i++)
     {
-        BYTE keyState = BYTE(GetKeyState(i));
-        if (keyState > 1)
+        int keyCode = glfwGetKey(targetWindow, i);
+        if (keyCode > 0)
             return true;
     }
 
     return false;
 }
-*/
+
+bool Input::AnyButtonDown()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        int keyCode = glfwGetMouseButton(targetWindow, i);
+        if (keyCode > inputState.previousMouseState.button[i])
+            return true;
+    }
+
+    return false;
+}
+
+bool Input::AnyButtonUp()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        int keyCode = glfwGetMouseButton(targetWindow, i);
+        if (keyCode < inputState.previousMouseState.button[i])
+            return true;
+    }
+
+    return false;
+}
+
+bool Input::AnyButton()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        int keyCode = glfwGetMouseButton(targetWindow, i);
+        if (keyCode > 0)
+            return true;
+    }
+
+    return false;
+}

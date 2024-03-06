@@ -14,7 +14,6 @@ class Layer;
 class Engine
 {
 public:
-    Engine();
     virtual ~Engine();
 
     virtual void OnStartUp() {};
@@ -30,9 +29,11 @@ public:
     static void PushLayer(std::string&& scene, Layer* layer);
     // Pops a layer and calls the OnShutDown function from the layer
     static void PopLayer(std::string&& scene, Layer* layer);
+protected:
+    Engine();
 
 private:
-    void CloseApplication(Listener listener);
+    void CloseApplication(Listener& listener);
 
     void StartUpScene();
     void ShutDownScene();

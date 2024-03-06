@@ -7,6 +7,8 @@
 
 #include "SystemsManager/Layer.h"
 
+class Listener;
+
 class GameLayer : public Layer
 {
     void OnStartUp() override;

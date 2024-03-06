@@ -18,6 +18,8 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include <format>
+
 #include "Math/Math.h"
 
 #ifdef PLATFORM_WINDOWS

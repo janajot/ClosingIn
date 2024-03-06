@@ -23,17 +23,14 @@ Engine::~Engine()
 {
 
 }
-void Test()
-{
 
-}
 void Engine::Run()
 {
-    Event::StartUp();
-    Input::StartUp();
-
     Window window;
     window.StartUp("ClosingIn", 640, 480);
+
+    Event::StartUp();
+    Input::StartUp(window.GetWindow());
 
     sceneStack = new SceneStack;
 
@@ -48,13 +45,10 @@ void Engine::Run()
         //glClear(GL_COLOR_BUFFER_BIT);
         window.Update();
 
-        std::string str;
-        std::getline(std::cin, str);
-        if(str == "Fire")
-            Event::FireEvent(EventType::WindowClose, nullptr);
-
         for(Layer* layer : activeScene->layerStack)
             layer->OnUpdate();
+
+        Input::Update();
     }
 
     Event::UnregisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
@@ -64,10 +58,10 @@ void Engine::Run()
 
     delete sceneStack;
 
-    window.ShutDown();
-
     Input::ShutDown();
     Event::ShutDown();
+
+    window.ShutDown();
 }
 
 void Engine::PushScene(std::string&& name)
@@ -120,7 +114,7 @@ void Engine::ShutDownScene()
     sceneStack->PopAll();
 }
 
-void Engine::CloseApplication(Listener listener)
+void Engine::CloseApplication(Listener& listener)
 {
     run = false;
 }

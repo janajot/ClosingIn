@@ -2,8 +2,7 @@
 // Created by Let'sBlend on 27/02/2024.
 //
 
-#include "EngineAPI.h"
-#include "EntryPoint.h"
+#include "EngineInit.h"
 #include "Level-GreenHill/GameLayer.h"
 
 class Application : public Engine
@@ -11,9 +10,9 @@ class Application : public Engine
 public:
     void OnStartUp() override
     {
-        std::cout << "Initialized application sub system" << std::endl;
         PushScene("GreenHill");
         PushLayer("GreenHill", new GameLayer);
+        std::cout << "Initialized application sub system" << std::endl;
     }
 
     void OnShutDown() override
