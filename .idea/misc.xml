@@ -6,10 +6,8 @@
       <file path="$PROJECT_DIR$/Closing" />
       <file path="$PROJECT_DIR$/Engine" />
     </sourceRoots>
-    <libraryRoots>
-      <file path="$PROJECT_DIR$/Engine/vendor" />
-    </libraryRoots>
     <excludeRoots>
+      <file path="$PROJECT_DIR$/Engine/vendor" />
       <file path="$PROJECT_DIR$/vendor" />
     </excludeRoots>
   </component>

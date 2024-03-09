@@ -30,7 +30,7 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* callback)
     {
-        Event::FireEvent(EventType::WindowClose);
+        Event::PushEvent(EventType::WindowClose);
     });
     glfwSetWindowSizeCallback(window, [](GLFWwindow* callback, int width, int height)
     {
@@ -41,7 +41,7 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         EventContext e{};
         e.uint16[0] = width;
         e.uint16[1] = height;
-        Event::FireEvent(EventType::WindowResize, e);
+        Event::PushEvent(EventType::WindowResize, e);
     });
     glfwSetWindowPosCallback(window, [](GLFWwindow* callback, int xpos, int ypos)
     {
@@ -52,7 +52,7 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         EventContext e{};
         e.uint16[0] = xpos;
         e.uint16[1] = ypos;
-        Event::FireEvent(EventType::WindowMoved, e);
+        Event::PushEvent(EventType::WindowMoved, e);
     });
     glfwSetWindowFocusCallback(window, [](GLFWwindow* callback, int focused)
     {
@@ -61,13 +61,13 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
 
         EventContext e{};
         e.int8[0] = (int8_t)focused;
-        Event::FireEvent(EventType::WindowFocus, e);
+        Event::PushEvent(EventType::WindowFocus, e);
     });
     glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int codepoint)
     {
         EventContext e{};
         e.uint32[0] = codepoint;
-        Event::FireEvent(EventType::TextInput, e);
+        Event::PushEvent(EventType::TextInput, e);
     });
     glfwSetKeyCallback(window, [](GLFWwindow* callback, int key, int scancode, int action, int mods)
     {
@@ -77,15 +77,15 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         {
             case GLFW_PRESS:
                 e.int8[0] = (int8_t)key;
-                Event::FireEvent(EventType::KeyPressed, e);
+                Event::PushEvent(EventType::KeyPressed, e);
                 break;
             case GLFW_RELEASE:
                 e.int8[0] = (int8_t)key;
-                Event::FireEvent(EventType::KeyReleased, e);
+                Event::PushEvent(EventType::KeyReleased, e);
                 break;
             case GLFW_REPEAT:
                 e.int8[0] = (int8_t)key;
-                Event::FireEvent(EventType::KeyPressed, e);
+                Event::PushEvent(EventType::KeyPressed, e);
                 break;
         }
     });
@@ -97,15 +97,15 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         {
             case GLFW_PRESS:
                 e.int8[0] = (int8_t)button;
-                Event::FireEvent(EventType::KeyPressed, e);
+                Event::PushEvent(EventType::KeyPressed, e);
                 break;
             case GLFW_RELEASE:
                 e.int8[0] = (int8_t)button;
-                Event::FireEvent(EventType::KeyReleased, e);
+                Event::PushEvent(EventType::KeyReleased, e);
                 break;
             case GLFW_REPEAT:
                 e.int8[0] = (int8_t)button;
-                Event::FireEvent(EventType::KeyPressed, e);
+                Event::PushEvent(EventType::KeyPressed, e);
                 break;
         }
     });
@@ -114,14 +114,14 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         EventContext e{};
         e.float32[0] = (float)xpos;
         e.float32[1] = (float)ypos;
-        Event::FireEvent(EventType::MouseMoved, e);
+        Event::PushEvent(EventType::MouseMoved, e);
     });
     glfwSetScrollCallback(window, [](GLFWwindow* callback, double xoffset, double yoffset)
     {
         EventContext e{};
         e.float32[0] = (float)xoffset;
         e.float32[1] = (float)yoffset;
-        Event::FireEvent(EventType::MouseScrolled, e);
+        Event::PushEvent(EventType::MouseScrolled, e);
     });
 }
 
@@ -130,9 +130,13 @@ void Window::ShutDown()
     glfwTerminate();
 }
 
-void Window::Update()
+void Window::UpdateEvents()
 {
     glfwPollEvents();
+}
+
+void Window::Update()
+{
     glfwSwapBuffers(window);
 }
 

@@ -40,7 +40,7 @@ struct Listener
     // The type of event listened to
     EventType eventType;
     // Pointer to the listener
-    std::function<void(Listener &)> listener = nullptr;
+    std::function<void(Listener&)> listener = nullptr;
     // Data that is different for different events, for example
     // MouseMoveEvent: mouse position, mousedelta..
     // KeyPressedEvent: Key..
@@ -75,13 +75,22 @@ public:
     template<typename T>
     static void RegisterEvent(EventType eventType, T* obj, void(T::*funcPtr)(Listener& listener))
     {
-        listeners[(int)eventType].insert(Listener{eventType, std::bind(funcPtr, obj, std::placeholders::_1)});
+        listeners[(int)eventType].push_back(Listener{eventType, std::bind(funcPtr, obj, std::placeholders::_1)});
     }
     // Unregisters a listener to a certain Event type
     template<typename T>
     static void UnregisterEvent(EventType eventType, T* obj, void(T::*funcPtr)(Listener& listener))
     {
-        listeners[(int)eventType].erase(Listener{eventType, std::bind(funcPtr, obj, std::placeholders::_1)});
+        std::vector<Listener>* data = &listeners[(int)eventType];
+        auto it = std::find(data->begin(), data->end(), Listener{eventType, std::bind(funcPtr, obj, std::placeholders::_1)});
+        if(it == data->end())
+        {
+            data->pop_back();
+            return;
+        }
+
+        std::swap(*it, data->back());
+        data->pop_back();
     }
 
     // Registers a listener to a certain Event type
@@ -89,20 +98,28 @@ public:
     // Unregisters a listener to a certain Event type
     static void UnregisterEvent(EventType eventType, const std::function<void(Listener&)>& funcPtr);
 
-    // Fires an event of a certain type with additional Data
-    static void FireEvent(EventType eventType, const EventContext& metaData);
-    // Fires an event of a certain type without additional Data
-    static void FireEvent(EventType eventType);
+    // Pushes an event of a certain type with additional Data to a stack
+    static void PushEvent(EventType eventType, const EventContext& metaData);
+    // Pushes an event of a certain type without additional Data to a stack
+    static void PushEvent(EventType eventType);
 
 private:
     Event() = default;
     ~Event() = default;
 
+    static void FireEvent(bool* run);
+
     static void StartUp();
     static void ShutDown();
 
+    // Concurrency
+    inline static bool start = false;
+    inline static std::mutex mut;
+    inline static std::condition_variable condition;
+
     // Stores all listeners
-    inline static std::unordered_set<Listener> listeners[NUM_EVENTS];
+    inline static std::vector<Listener> listeners[NUM_EVENTS];
+    inline static std::vector<Listener> senders;
 };
 
 #endif //CLOSINGIN_EVENT_H

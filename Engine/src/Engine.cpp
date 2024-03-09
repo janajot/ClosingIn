@@ -3,6 +3,7 @@
 //
 
 #include "Engine.h"
+#include "EngineTime.h"
 
 #include "Events/Event.h"
 #include "Events/Input.h"
@@ -26,6 +27,8 @@ Engine::~Engine()
 
 void Engine::Run()
 {
+    EngineTime engineTime;
+
     Window window;
     window.StartUp("ClosingIn", 640, 480);
 
@@ -38,20 +41,30 @@ void Engine::Run()
     StartUpScene();
 
     Event::RegisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
+    Event::RegisterEvent(EventType::TextInput, this, &Engine::Test);
+
+    std::thread myThread(Event::FireEvent, &run);
 
     while (run)
     {
+        engineTime.UpdateStartTime();
+        window.UpdateEvents();
+
         //glClearColor(1, 0, 1, 1);
         //glClear(GL_COLOR_BUFFER_BIT);
-        window.Update();
 
+        window.Update();
         for(Layer* layer : activeScene->layerStack)
             layer->OnUpdate();
 
         Input::Update();
+        engineTime.UpdateEndTime(120);
     }
 
+    myThread.join();
+
     Event::UnregisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
+    Event::UnregisterEvent(EventType::TextInput, this, &Engine::Test);
 
     OnShutDown();
     ShutDownScene();
@@ -117,4 +130,9 @@ void Engine::ShutDownScene()
 void Engine::CloseApplication(Listener& listener)
 {
     run = false;
+}
+
+void Engine::Test(Listener& listener)
+{
+    std::cout << listener.metaData.uint8 << std::endl;
 }
