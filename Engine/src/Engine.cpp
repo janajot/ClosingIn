@@ -43,13 +43,10 @@ void Engine::Run()
     Event::RegisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
     Event::RegisterEvent(EventType::TextInput, this, &Engine::Test);
 
-    std::thread myThread(Event::FireEvent, &run);
-
     while (run)
     {
         engineTime.UpdateStartTime();
         window.UpdateEvents();
-        Event::FireEvent()
 
         //glClearColor(1, 0, 1, 1);
         //glClear(GL_COLOR_BUFFER_BIT);
@@ -61,8 +58,6 @@ void Engine::Run()
         Input::Update();
         engineTime.UpdateEndTime(120);
     }
-
-    myThread.join();
 
     Event::UnregisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
     Event::UnregisterEvent(EventType::TextInput, this, &Engine::Test);

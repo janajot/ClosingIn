@@ -98,16 +98,11 @@ public:
     // Unregisters a listener to a certain Event type
     static void UnregisterEvent(EventType eventType, const std::function<void(Listener&)>& funcPtr);
 
-    // Pushes an event of a certain type with additional Data to a stack
-    static void PushEvent(EventType eventType, const EventContext& metaData);
-    // Pushes an event of a certain type without additional Data to a stack
-    static void PushEvent(EventType eventType);
-
+    static void FireEvent(const EventType& eventType);
+    static void FireEvent(const EventType& eventType, const EventContext& e);
 private:
     Event() = default;
     ~Event() = default;
-
-    static void FireEvent(bool* run);
 
     static void StartUp();
     static void ShutDown();

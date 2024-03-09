@@ -33,23 +33,19 @@ void Event::UnregisterEvent(EventType eventType, const std::function<void(Listen
     data->pop_back();
 }
 
-void Event::FireEvent(bool* run)
+void Event::FireEvent(const EventType& eventType)
 {
-    std::vector<Listener> senderStack;
-
-    while(*run)
+    for(Listener& listener : listeners[(int)eventType])
     {
-        {
-            std::lock_guard<std::mutex> lock(mut);
-            senderStack = senders;
-            senders.clear();
-        }
+        listener.listener(listener);
+    }
+}
 
-        for(Listener& listener : senderStack)
-        {
-            listener.listener(listener);
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+void Event::FireEvent(const EventType& eventType, const EventContext& e)
+{
+    for(Listener& listener : listeners[(int)eventType])
+    {
+        listener.metaData = e;
+        listener.listener(listener);
     }
 }
