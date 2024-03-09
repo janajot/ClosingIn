@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <thread>
+#include <future>
 #include <utility>
 
 #include <string>

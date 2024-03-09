@@ -29,6 +29,8 @@ public:
     static void PushLayer(std::string&& scene, Layer* layer);
     // Pops a layer and calls the OnShutDown function from the layer
     static void PopLayer(std::string&& scene, Layer* layer);
+
+    void Test(Listener& listener);
 protected:
     Engine();
 

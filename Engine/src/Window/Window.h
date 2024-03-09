@@ -16,6 +16,7 @@ public:
     void StartUp(std::string&& name, int&& xpos, int&& ypos);
     void ShutDown();
 
+    void UpdateEvents();
     void Update();
 
     void SetSize(const uint16_t& width, const uint16_t& height);

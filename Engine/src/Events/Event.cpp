@@ -3,6 +3,7 @@
 //
 
 #include "Event.h"
+#include "EngineTime.h"
 
 void Event::StartUp()
 {
@@ -18,27 +19,37 @@ void Event::ShutDown()
 
 void Event::RegisterEvent(EventType eventType, const std::function<void(Listener&)>& funcPtr)
 {
-    listeners[(int)eventType].insert(Listener{eventType, funcPtr});
+    listeners[(int)eventType].push_back(Listener{eventType, funcPtr});
 }
 
 void Event::UnregisterEvent(EventType eventType, const std::function<void(Listener&)>& funcPtr)
 {
-    listeners[(int)eventType].erase(Listener{eventType, funcPtr});
+    std::vector<Listener>* data = &listeners[(int)eventType];
+    auto it = std::find(data->begin(), data->end(), Listener{eventType, funcPtr});
+    if(it == data->end())
+        data->pop_back();
+
+    std::swap(*it, data->back());
+    data->pop_back();
 }
 
-void Event::FireEvent(EventType eventType, const EventContext& metaData)
+void Event::FireEvent(bool* run)
 {
-    for(Listener listener : listeners[(int)eventType])
-    {
-        listener.metaData = metaData;
-        listener.listener(listener);
-    }
-}
+    std::vector<Listener> senderStack;
 
-void Event::FireEvent(EventType eventType)
-{
-    for(Listener listener : listeners[(int)eventType])
+    while(*run)
     {
-        listener.listener(listener);
+        {
+            std::lock_guard<std::mutex> lock(mut);
+            senderStack = senders;
+            senders.clear();
+        }
+
+        for(Listener& listener : senderStack)
+        {
+            listener.listener(listener);
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }

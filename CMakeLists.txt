@@ -49,7 +49,9 @@ add_library(Engine
         Engine/src/Window/Window.h
         Engine/includes/EngineInit.h
         Engine/src/Events/EventType.h
-        Engine/src/Math/Math.h)
+        Engine/src/Math/Math.h
+        Engine/src/EngineTime.h
+        Engine/src/EngineTime.cpp)
 target_precompile_headers(Engine PUBLIC Engine/src/pch.h)
 
 #//////////////////////////////////////////////////////////////////////////////////
