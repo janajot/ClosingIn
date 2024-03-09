@@ -100,6 +100,7 @@ public:
 
     static void FireEvent(const EventType& eventType);
     static void FireEvent(const EventType& eventType, const EventContext& e);
+
 private:
     Event() = default;
     ~Event() = default;

@@ -35,7 +35,7 @@ void Event::UnregisterEvent(EventType eventType, const std::function<void(Listen
 
 void Event::FireEvent(const EventType& eventType)
 {
-    for(Listener& listener : listeners[(int)eventType])
+    for (Listener &listener: listeners[(int) eventType])
     {
         listener.listener(listener);
     }
