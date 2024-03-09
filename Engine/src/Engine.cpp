@@ -39,6 +39,8 @@ void Engine::Run()
 
     OnStartUp();
     StartUpScene();
+    // unnecessarily
+    // necessary
 
     Event::RegisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
     Event::RegisterEvent(EventType::TextInput, this, &Engine::Test);
