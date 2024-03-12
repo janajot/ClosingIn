@@ -7,14 +7,14 @@
 #include "Scene.h"
 #include "LayerStack.h"
 
-void SceneStack::PushScene(std::string&& name)
+void SceneStack::PushScene(const std::string& name)
 {
-    scenePtrs.emplace_back(new Scene(std::move(name)));
+    scenePtrs.emplace_back(new Scene(name));
 }
 
-void SceneStack::PopScene(std::string&& name)
+void SceneStack::PopScene(const std::string& name)
 {
-    std::shared_ptr<Scene> scene = GetScene(std::move(name));
+    Ref<Scene> scene = GetScene(name);
     scene->layerStack.PopAll();
 
     auto id = std::find(scenePtrs.begin(), scenePtrs.end(), scene);
@@ -23,16 +23,16 @@ void SceneStack::PopScene(std::string&& name)
 
 void SceneStack::PopAll()
 {
-    for(const std::shared_ptr<Scene>& scene : scenePtrs)
+    for(const Ref<Scene>& scene : scenePtrs)
     {
         scene->layerStack.PopAll();
     }
     scenePtrs.clear();
 }
 
-std::shared_ptr<Scene> SceneStack::GetScene(std::string&& name)
+Ref<Scene> SceneStack::GetScene(const std::string& name)
 {
-    for(int i = scenePtrs.size() - 1; i >= 0; i--)
+    for(int i = (int)scenePtrs.size() - 1; i >= 0; i--)
     {
         if(scenePtrs[i]->name == name)
         {
@@ -41,4 +41,34 @@ std::shared_ptr<Scene> SceneStack::GetScene(std::string&& name)
     }
     std::cout << "[ERROR]: Scene doesn't exist!" << std::endl; // Change to assertion
     return nullptr;
+}
+
+Ref<Scene> SceneStack::GetScene(const int& index)
+{
+    if(index < scenePtrs.size())
+        return scenePtrs[index];
+
+    std::cout << "[ERROR]: Scene doesn't exist!" << std::endl; // Change to assertion
+    return nullptr;
+}
+
+bool SceneStack::Exists(const std::string& name)
+{
+    for(int i = 0; i < (int)scenePtrs.size(); i++)
+    {
+        if(scenePtrs[i]->name == name)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void SceneStack::Erase(const std::string &name)
+{
+    Ref<Scene> scene = GetScene(name);
+
+    auto it = std::find(scenePtrs.begin(), scenePtrs.end(), scene);
+    scenePtrs.erase(it);
 }

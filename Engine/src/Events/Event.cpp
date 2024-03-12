@@ -33,19 +33,43 @@ void Event::UnregisterEvent(EventType eventType, const std::function<void(Listen
     data->pop_back();
 }
 
-void Event::FireEvent(const EventType& eventType)
+
+void Event::PushEvent(const EventType& eventType)
 {
+    senders[(int)eventType] = Sender{eventType};
     for (Listener &listener: listeners[(int) eventType])
     {
+        listener.eventType = eventType;
         listener.listener(listener);
+        //senders.push_back(Sender);
     }
 }
 
-void Event::FireEvent(const EventType& eventType, const EventContext& e)
+void Event::PushEvent(const EventType& eventType, const EventContext& e)
 {
+    senders[(int)eventType] = Sender{eventType, e};
     for(Listener& listener : listeners[(int)eventType])
     {
+        listener.eventType = eventType;
         listener.metaData = e;
-        listener.listener(listener);
+        // senders.push_back(listener);
     }
+}
+
+void Event::FireEvents()
+{
+    for(const Sender& sender : senders)
+    {
+        if(sender.eventType == EventType::None)
+            continue;
+
+        for(Listener& send : listeners[(int)sender.eventType])
+        {
+            send.eventType = senders[(int)sender.eventType].eventType;
+            send.metaData = senders[(int)sender.eventType].metaData;
+            send.listener(send);
+        }
+    }
+
+    senders.fill(Sender{EventType::None, EventContext{}});
 }

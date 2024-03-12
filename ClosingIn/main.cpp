@@ -11,7 +11,7 @@ public:
     void OnStartUp() override
     {
         PushScene("GreenHill");
-        PushLayer("GreenHill", new GameLayer);
+        PushLayer("GreenHill", CreateRef<GameLayer>());
         std::cout << "Initialized application sub system" << std::endl;
     }
 

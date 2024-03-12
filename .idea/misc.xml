@@ -3,11 +3,15 @@
   <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
   <component name="CidrRootsConfiguration">
     <sourceRoots>
-      <file path="$PROJECT_DIR$/Closing" />
+      <file path="$PROJECT_DIR$/ClosingIn" />
       <file path="$PROJECT_DIR$/Engine" />
+      <file path="$PROJECT_DIR$/Engine/vendor/glad/include" />
+      <file path="$PROJECT_DIR$/Engine/vendor/glfw/include" />
+      <file path="$PROJECT_DIR$/Engine/vendor/glm/glm" />
     </sourceRoots>
     <excludeRoots>
       <file path="$PROJECT_DIR$/Engine/vendor" />
+      <file path="$PROJECT_DIR$/bin" />
       <file path="$PROJECT_DIR$/vendor" />
     </excludeRoots>
   </component>

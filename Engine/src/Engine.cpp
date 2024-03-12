@@ -15,6 +15,8 @@
 #include "SystemsManager/Scene.h"
 #include "SystemsManager/SceneStack.h"
 
+#include "Renderer/Renderer.h"
+
 Engine::Engine()
 {
     s_Instance = this;
@@ -28,33 +30,25 @@ Engine::~Engine()
 void Engine::Run()
 {
     EngineTime engineTime;
+    SceneStack stack;
+    sceneStack = &stack;
 
-    Window window;
-    window.StartUp("ClosingIn", 640, 480);
+    m_Window = CreateRef<Window>("ClosingIn", 640, 480);
+    m_Renderer = CreateRef<Renderer>();
 
     Event::StartUp();
-    Input::StartUp(window.GetWindow());
-
-    sceneStack = new SceneStack;
+    Input::StartUp(m_Window->GetWindow());
 
     OnStartUp();
     StartUpScene();
-    // unnecessarily
-    // necessary
 
     Event::RegisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
-    Event::RegisterEvent(EventType::TextInput, this, &Engine::Test);
 
     while (run)
     {
         engineTime.UpdateStartTime();
-        window.UpdateEvents();
 
-        //glClearColor(1, 0, 1, 1);
-        //glClear(GL_COLOR_BUFFER_BIT);
-
-        window.Update();
-        for(Layer* layer : activeScene->layerStack)
+        for(const Ref<Layer>& layer : activeScene->layerStack)
             layer->OnUpdate();
 
         Input::Update();
@@ -62,51 +56,63 @@ void Engine::Run()
     }
 
     Event::UnregisterEvent(EventType::WindowClose, this, &Engine::CloseApplication);
-    Event::UnregisterEvent(EventType::TextInput, this, &Engine::Test);
 
     OnShutDown();
     ShutDownScene();
 
-    delete sceneStack;
-
     Input::ShutDown();
     Event::ShutDown();
-
-    window.ShutDown();
 }
 
-void Engine::PushScene(std::string&& name)
+void Engine::PushScene(const std::string& scene)
 {
-    sceneStack->PushScene(std::move(name));
+    if(sceneStack->Exists(scene))
+    {
+        // TODO: Warn scene already exists. Everything associated to this scene will be overwritten
+        sceneStack->Erase(scene);
+    }
+
+    sceneStack->PushScene(scene);
+    Ref<Scene> scenePtr = sceneStack->GetScene(scene);
+    // Push all engine layers which shall be run before the user layers
+    scenePtr->layerStack.PushLayer(m_Window); // 1st
+
+    scenePtr->layerStack.userLayerStartIndex = 1;
+    scenePtr->layerStack.userLayerEndIndex = scenePtr->layerStack.userLayerStartIndex;
+
+    // Push all engine layers which shall be run after the user layers
+    scenePtr->layerStack.PushLayer(m_Renderer);
 }
 
-void Engine::PopScene(std::string&& name)
+void Engine::PopScene(const std::string &scene)
 {
-    sceneStack->PopScene(std::move(name));
+    sceneStack->PopScene(scene);
 }
 
 void Engine::SwitchScene(const std::string& name)
 {
-    for(const std::shared_ptr<Scene>& scene : *sceneStack)
+    for(const Ref<Scene>& scene : *sceneStack)
     {
         if(scene->name == name)
             activeScene = scene;
     }
 
     if(activeScene->layerStack.empty())
-        std::cout << "[WARN]: No layer was pushed to active scene!" << std::endl;
+        std::cout << "[WARN]: No layer was pushed to active scene!" << std::endl; // TODO: Assertion no layer was pushed
 }
 
-void Engine::PushLayer(std::string&& scene, Layer *layer)
+void Engine::PushLayer(const std::string& scene, const Ref<Layer>& layer)
 {
-    std::shared_ptr<Scene> getScene = sceneStack->GetScene(std::move(scene));
-    getScene->layerStack.PushLayer(layer);
+    Ref<Scene> scenePtr = sceneStack->GetScene(scene);
+    scenePtr->layerStack.PushLayer(layer);
+    scenePtr->layerStack.userLayerEndIndex++;
 }
 
-void Engine::PopLayer(std::string&& scene, Layer *layer)
+void Engine::PopLayer(const std::string& scene, const Ref<Layer>& layer)
 {
-    std::shared_ptr<Scene> getScene = sceneStack->GetScene(std::move(scene));
-    getScene->layerStack.PopLayer(layer);
+    Ref<Scene> scenePtr = sceneStack->GetScene(scene);
+    scenePtr->layerStack.PopLayer(layer);
+    scenePtr->layerStack.userLayerEndIndex--;
 }
 
 void Engine::StartUpScene()
@@ -128,9 +134,4 @@ void Engine::ShutDownScene()
 void Engine::CloseApplication(Listener& listener)
 {
     run = false;
-}
-
-void Engine::Test(Listener& listener)
-{
-    std::cout << listener.metaData.uint8 << std::endl;
 }

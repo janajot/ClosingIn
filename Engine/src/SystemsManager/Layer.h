@@ -11,8 +11,8 @@ class Layer
 public:
     virtual ~Layer() {}
 
-    virtual void OnStartUp() {};
-    virtual void OnShutDown() {};
+    virtual void OnAttach() {};
+    virtual void OnDetach() {};
     virtual void OnUpdate() {};
 
 protected:

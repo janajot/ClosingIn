@@ -3,34 +3,38 @@
 //
 
 #include "Window.h"
+#include "glad/glad.h"
 #include "glfw/glfw3.h"
 
 #include "Events/Event.h"
 
-void Window::StartUp(std::string&& name, int&& width, int&& height)
+Window::Window(const std::string &name, const int &width, const int &height)
 {
-    data.name = std::move(name);
+    data.name = name;
     data.width = width;
     data.height = height;
 
     if(!glfwInit())
         return; // <- Assertions please Daddy, assert me harder
 
-    window = glfwCreateWindow(width, height, data.name.c_str(), nullptr, nullptr);
+    window = glfwCreateWindow(data.width, data.height, data.name.c_str(), nullptr, nullptr);
 
     if(!window)
     {
         glfwTerminate();
-        return; // <- Die Assertions Bruuuuddaaaaa
+        return; // <- TODO: Die Assertions Bruuuuddaaaaa
     }
 
     glfwMakeContextCurrent(window);
+
+    m_Context.StartUp(window);
+
     glfwSetWindowUserPointer(window, &data);
     SetVSync(data.vsync);
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* callback)
     {
-        Event::FireEvent(EventType::WindowClose);
+        Event::PushEvent(EventType::WindowClose);
     });
     glfwSetWindowSizeCallback(window, [](GLFWwindow* callback, int width, int height)
     {
@@ -39,9 +43,9 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         pData->height = height;
 
         EventContext e{};
-        e.uint16[0] = width;
-        e.uint16[1] = height;
-        Event::FireEvent(EventType::WindowResize, e);
+        e.ui16[0] = width;
+        e.ui16[1] = height;
+        Event::PushEvent(EventType::WindowResize, e);
     });
     glfwSetWindowPosCallback(window, [](GLFWwindow* callback, int xpos, int ypos)
     {
@@ -50,9 +54,9 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         pData->posY = ypos;
 
         EventContext e{};
-        e.uint16[0] = xpos;
-        e.uint16[1] = ypos;
-        Event::FireEvent(EventType::WindowMoved, e);
+        e.ui16[0] = xpos;
+        e.ui16[1] = ypos;
+        Event::PushEvent(EventType::WindowMoved, e);
     });
     glfwSetWindowFocusCallback(window, [](GLFWwindow* callback, int focused)
     {
@@ -60,14 +64,14 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         pData->focused = focused;
 
         EventContext e{};
-        e.int8[0] = (int8_t)focused;
-        Event::FireEvent(EventType::WindowFocus, e);
+        e.i8[0] = (int8_t)focused;
+        Event::PushEvent(EventType::WindowFocus, e);
     });
     glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int codepoint)
     {
         EventContext e{};
-        e.uint32[0] = codepoint;
-        Event::FireEvent(EventType::TextInput, e);
+        e.ui32[0] = codepoint;
+        Event::PushEvent(EventType::TextInput, e);
     });
     glfwSetKeyCallback(window, [](GLFWwindow* callback, int key, int scancode, int action, int mods)
     {
@@ -76,16 +80,16 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         switch(action)
         {
             case GLFW_PRESS:
-                e.int8[0] = (int8_t)key;
-                Event::FireEvent(EventType::KeyPressed, e);
+                e.i8[0] = (int8_t)key;
+                Event::PushEvent(EventType::KeyPressed, e);
                 break;
             case GLFW_RELEASE:
-                e.int8[0] = (int8_t)key;
-                Event::FireEvent(EventType::KeyReleased, e);
+                e.i8[0] = (int8_t)key;
+                Event::PushEvent(EventType::KeyReleased, e);
                 break;
             case GLFW_REPEAT:
-                e.int8[0] = (int8_t)key;
-                Event::FireEvent(EventType::KeyPressed, e);
+                e.i8[0] = (int8_t)key;
+                Event::PushEvent(EventType::KeyPressed, e);
                 break;
         }
     });
@@ -96,48 +100,51 @@ void Window::StartUp(std::string&& name, int&& width, int&& height)
         switch (action)
         {
             case GLFW_PRESS:
-                e.int8[0] = (int8_t)button;
-                Event::FireEvent(EventType::KeyPressed, e);
+                e.i8[0] = (int8_t)button;
+                Event::PushEvent(EventType::KeyPressed, e);
                 break;
             case GLFW_RELEASE:
-                e.int8[0] = (int8_t)button;
-                Event::FireEvent(EventType::KeyReleased, e);
+                e.i8[0] = (int8_t)button;
+                Event::PushEvent(EventType::KeyReleased, e);
                 break;
             case GLFW_REPEAT:
-                e.int8[0] = (int8_t)button;
-                Event::FireEvent(EventType::KeyPressed, e);
+                e.i8[0] = (int8_t)button;
+                Event::PushEvent(EventType::KeyPressed, e);
                 break;
         }
     });
     glfwSetCursorPosCallback(window, [](GLFWwindow* callback, double xpos, double ypos)
     {
         EventContext e{};
-        e.float32[0] = (float)xpos;
-        e.float32[1] = (float)ypos;
-        Event::FireEvent(EventType::MouseMoved, e);
+        e.f32[0] = (float)xpos;
+        e.f32[1] = (float)ypos;
+        Event::PushEvent(EventType::MouseMoved, e);
     });
     glfwSetScrollCallback(window, [](GLFWwindow* callback, double xoffset, double yoffset)
     {
         EventContext e{};
-        e.float32[0] = (float)xoffset;
-        e.float32[1] = (float)yoffset;
-        Event::FireEvent(EventType::MouseScrolled, e);
+        e.f32[0] = (float)xoffset;
+        e.f32[1] = (float)yoffset;
+        Event::PushEvent(EventType::MouseScrolled, e);
     });
+
+    // To Set the viewport
+    EventContext e{};
+    e.ui16[0] = width;
+    e.ui16[1] = height;
+    Event::PushEvent(EventType::WindowResize, e);
 }
 
-void Window::ShutDown()
+Window::~Window()
 {
     glfwTerminate();
 }
 
-void Window::UpdateEvents()
+void Window::OnUpdate()
 {
     glfwPollEvents();
-}
-
-void Window::Update()
-{
-    glfwSwapBuffers(window);
+    Event::FireEvents();
+    m_Context.SwapBuffers();
 }
 
 void Window::SetVSync(const bool& enabled)
@@ -165,3 +172,4 @@ GLFWwindow *Window::GetWindow()
 {
     return window;
 }
+

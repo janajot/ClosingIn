@@ -5,19 +5,18 @@
 #ifndef CLOSING_WINDOW_H
 #define CLOSING_WINDOW_H
 
+#include "SystemsManager/Layer.h"
+#include "Renderer/OpenGl/OpenGLContext.h"
+
 class GLFWwindow;
 
-class Window
+class Window : public Layer
 {
 public:
-    Window() = default;
-    ~Window() = default;
+    Window(const std::string& name, const int& width, const int& height);
+    ~Window();
 
-    void StartUp(std::string&& name, int&& xpos, int&& ypos);
-    void ShutDown();
-
-    void UpdateEvents();
-    void Update();
+    void OnUpdate() override;
 
     void SetSize(const uint16_t& width, const uint16_t& height);
     void SetFocus(const bool& focused);
@@ -42,6 +41,8 @@ private:
 
     GLFWwindow* window;
     WindowData data;
+
+    OpenGLContext m_Context;
 };
 
 

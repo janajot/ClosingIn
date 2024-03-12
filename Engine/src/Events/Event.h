@@ -12,26 +12,26 @@ struct EventContext
     //128 bits
     union
     {
-        int64_t int64[2];
-        uint64_t uint64[2];
-        int_fast64_t fint64[2];
+        int64 i64[2];
+        uint64 ui64[2];
+        fint64 fi64[2];
 
-        int32_t int32[4];
-        uint32_t uint32[4];
-        int_fast32_t fint32[4];
+        int32 i32[4];
+        uint32 ui32[4];
+        fint32 fi32[4];
 
-        int16_t int16[8];
-        uint16_t uint16[8];
-        int_fast16_t fint16[8];
+        int16 i16[8];
+        uint16 ui16[8];
+        fint16 fi16[8];
 
-        int8_t int8[16];
-        uint8_t uint8[16];
-        int_fast8_t fint8[16];
+        int8 i8[16];
+        uint8 ui8[16];
+        fint8 fi8[16];
 
-        char char4[16];
+        char c4[16];
 
-        float float32[4];
-        double double32[4];
+        float f32[4];
+        double d64[2];
     };
 };
 
@@ -63,6 +63,16 @@ struct std::hash<Listener>
         size_t h2 = std::hash<void*>{}(ptr);
         return h1 ^ (h2 << 1); // or use another method to combine hash values
     }
+};
+
+struct Sender
+{
+    // The type of event listened to
+    EventType eventType;
+    // Data that is different for different events, for example
+    // MouseMoveEvent: mouse position, mousedelta..
+    // KeyPressedEvent: Key..
+    EventContext metaData{};
 };
 
 class Engine;
@@ -98,8 +108,11 @@ public:
     // Unregisters a listener to a certain Event type
     static void UnregisterEvent(EventType eventType, const std::function<void(Listener&)>& funcPtr);
 
-    static void FireEvent(const EventType& eventType);
-    static void FireEvent(const EventType& eventType, const EventContext& e);
+    // Push an event to be Fired
+    static void PushEvent(const EventType& eventType);
+    static void PushEvent(const EventType& eventType, const EventContext& e);
+
+    static void FireEvents();
 
 private:
     Event() = default;
@@ -108,8 +121,9 @@ private:
     static void StartUp();
     static void ShutDown();
 
-    // Stores all listeners
+    // Stores all listeners&senders
     inline static std::vector<Listener> listeners[NUM_EVENTS];
+    inline static std::array<Sender, NUM_EVENTS> senders;
 };
 
 #endif //CLOSINGIN_EVENT_H

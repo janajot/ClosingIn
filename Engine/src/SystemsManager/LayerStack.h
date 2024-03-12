@@ -10,16 +10,24 @@ class Layer;
 class LayerStack
 {
 public:
-    void PushLayer(Layer* layer);
-    void PopLayer(Layer* layer);
+    LayerStack() = default;
+    ~LayerStack();
+
+
+    void PushLayer(const Ref<Layer>& layer);
+    void PopLayer(const Ref<Layer>& layer);
     void PopAll();
 
-    inline std::vector<Layer*>::iterator begin() { return layerPtrs.begin(); }
-    inline std::vector<Layer*>::iterator end() { return layerPtrs.end(); }
+    inline std::vector<Ref<Layer>>::iterator begin() { return layerPtrs.begin(); }
+    inline std::vector<Ref<Layer>>::iterator end() { return layerPtrs.end(); }
     inline bool empty() { return layerPtrs.empty(); }
 
+    // After which index do the layers created by the user start
+    int userLayerStartIndex = 0;
+    // After which index do the layers created by the user start
+    int userLayerEndIndex = 0;
 private:
-    std::vector<Layer*> layerPtrs;
+    std::vector<Ref<Layer>> layerPtrs;
 };
 
 

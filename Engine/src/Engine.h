@@ -11,6 +11,9 @@ class SceneStack;
 class Scene;
 class Layer;
 
+class Window;
+class Renderer;
+
 class Engine
 {
 public:
@@ -21,16 +24,14 @@ public:
 
     void Run();
 
-    static void PushScene(std::string&& name);
-    static void PopScene(std::string&& name);
+    static void PushScene(const std::string& scene);
+    static void PopScene(const std::string& scene);
     static void SwitchScene(const std::string& name);
 
-    // Pushes a layer and calls the OnStartUp function from the layer
-    static void PushLayer(std::string&& scene, Layer* layer);
-    // Pops a layer and calls the OnShutDown function from the layer
-    static void PopLayer(std::string&& scene, Layer* layer);
-
-    void Test(Listener& listener);
+    // Pushes a layer and calls the OnAttach function on the layer.
+    static void PushLayer(const std::string& scene, const Ref<Layer>& layer);
+    // Pops a layer and calls the OnDetach function from the layer.
+    static void PopLayer(const std::string& scene, const Ref<Layer>& layer);
 protected:
     Engine();
 
@@ -40,11 +41,13 @@ private:
     void StartUpScene();
     void ShutDownScene();
 
-    inline static std::shared_ptr<Scene> activeScene = nullptr;
+    inline static Ref<Scene> activeScene = nullptr;
     inline static SceneStack* sceneStack;
 
     inline static bool run = true;
 
+    inline static Ref<Window> m_Window;
+    inline static Ref<Renderer> m_Renderer;
     inline static Engine* s_Instance = nullptr;
 };
 
