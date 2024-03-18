@@ -10,7 +10,7 @@
 class Scene
 {
 public:
-    Scene(std::string&& name) : name(name) {}
+    Scene(const std::string& name) : name(name) {}
     ~Scene() = default;
 
     std::string name = "None";

@@ -5,15 +5,18 @@
 #ifndef APPLICATION_ENGINE_H
 #define APPLICATION_ENGINE_H
 
+class Listener;
+
 class SceneStack;
 class Scene;
-
 class Layer;
+
+class Window;
+class Renderer;
 
 class Engine
 {
 public:
-    Engine();
     virtual ~Engine();
 
     virtual void OnStartUp() {};
@@ -21,21 +24,30 @@ public:
 
     void Run();
 
-    static void PushScene(std::string&& name);
-    static void PopScene(std::string&& name);
+    static void PushScene(const std::string& scene);
+    static void PopScene(const std::string& scene);
     static void SwitchScene(const std::string& name);
 
-    static void PushLayer(std::string&& scene, Layer* layer);
-    static void PopLayer(std::string&& scene, Layer* layer);
+    // Pushes a layer and calls the OnAttach function on the layer.
+    static void PushLayer(const std::string& scene, const Ref<Layer>& layer);
+    // Pops a layer and calls the OnDetach function from the layer.
+    static void PopLayer(const std::string& scene, const Ref<Layer>& layer);
+protected:
+    Engine();
 
-    inline static bool run = true;
 private:
+    void CloseApplication(Listener& listener);
+
     void StartUpScene();
     void ShutDownScene();
 
-    inline static std::shared_ptr<Scene> activeScene = nullptr;
+    inline static Ref<Scene> activeScene = nullptr;
     inline static SceneStack* sceneStack;
 
+    inline static bool run = true;
+
+    inline static Ref<Window> m_Window;
+    inline static Ref<Renderer> m_Renderer;
     inline static Engine* s_Instance = nullptr;
 };
 

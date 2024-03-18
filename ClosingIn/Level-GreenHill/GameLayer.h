@@ -7,10 +7,12 @@
 
 #include "SystemsManager/Layer.h"
 
+class Listener;
+
 class GameLayer : public Layer
 {
-    void OnStartUp() override;
-    void OnShutDown() override;
+    void OnAttach() override;
+    void OnDetach() override;
 
     void OnUpdate() override;
 };

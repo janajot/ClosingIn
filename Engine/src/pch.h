@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <thread>
+#include <future>
 #include <utility>
 #include <format>
 
@@ -20,11 +21,8 @@
 #include <unordered_map>
 #include <source_location>
 #include <iomanip>
+#include <format>
 
 #include "Math/Math.h"
 
-#ifdef PLATFORM_WINDOWS
-#include <Windows.h>
-#elif PLATRFORM_LINUX
-#elif PLATRFORM_MAC
-#endif
+#include "Defines.h"

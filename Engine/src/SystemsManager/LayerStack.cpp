@@ -5,27 +5,30 @@
 #include "LayerStack.h"
 #include "Layer.h"
 
-void LayerStack::PushLayer(Layer *layer)
+LayerStack::~LayerStack()
 {
-    layer->OnStartUp();
-    layerPtrs.emplace_back(layer);
+    PopAll();
 }
 
-void LayerStack::PopLayer(Layer *layer)
+void LayerStack::PushLayer(const Ref<Layer>& layer)
 {
-    layer->OnShutDown();
+    layerPtrs.insert(layerPtrs.begin() + userLayerStartIndex, layer);
+    layer->OnAttach();
+}
+
+void LayerStack::PopLayer(const Ref<Layer>& layer)
+{
+    layer->OnDetach();
     auto id = std::find(layerPtrs.begin(), layerPtrs.end(), layer);
 
-    delete layer;
     layerPtrs.erase(id);
 }
 
 void LayerStack::PopAll()
 {
-    for(Layer* layer : layerPtrs)
+    for(const Ref<Layer>& layer : layerPtrs)
     {
-        layer->OnShutDown();
-        delete layer;
+        layer->OnDetach();
     }
 
     layerPtrs.clear();

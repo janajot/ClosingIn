@@ -28,13 +28,12 @@ struct InputState
 };
 
 class Event;
+class GLFWwindow;
 
 class Input : Event
 {
+    friend class Engine;
 public:
-    static void StartUp();
-    static void ShutDown();
-
     // Check if the specified Key is Pressed
     static bool GetKeyDown(KeyCode key);
     // Check if the specified Key is Released
@@ -49,15 +48,31 @@ public:
     // Check if the specified Mouse Button is Hold
     static bool GetButton(Button button);
 
-    // Check if any Key or Mouse Button was Pressed
+    // Check if any Key was Pressed
     static bool AnyKeyDown();
-    // Check if any Key or Mouse Button was Released
+    // Check if any Key was Released
     static bool AnyKeyUp();
-    // Check if any Key or Mouse Button was Hold
+    // Check if any Key was Hold
     static bool AnyKey();
 
+    // Check if any Mouse Button was Pressed
+    static bool AnyButtonDown();
+    // Check if any Mouse Button was Released
+    static bool AnyButtonUp();
+    // Check if any Mouse Button was Hold
+    static bool AnyButton();
+
 private:
+    Input() = default;
+    ~Input() = default;
+
+    static void StartUp(GLFWwindow* glfWwindow);
+    static void ShutDown();
+
+    static void Update();
+
     inline static InputState inputState;
+    inline static GLFWwindow* targetWindow;
 };
 
 
