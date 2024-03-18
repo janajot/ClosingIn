@@ -3,6 +3,9 @@
 //
 
 #include "Engine.h"
+#include "Debug/Logger.h"
+#include "Util/ConsoleColours.h"
+#include "Debug/Assert.h"
 
 #include "SystemsManager/Layer.h"
 #include "SystemsManager/LayerStack.h"
@@ -24,6 +27,15 @@ Engine::~Engine()
 
 void Engine::Run()
 {
+    //TESTS JAN
+    Logger logger{"myLogger"};
+    logger.log("test", LogLevel::info);
+    Assert::equals(1, 1, logger);
+    Assert::that(true);
+    Logger::warn("my dick is too long");
+    Logger::error("test");
+    //TESTS END JAN
+
     // Testing Event System
     /////////////////////////////////////////////////////////////////
     Event::StartUp();
